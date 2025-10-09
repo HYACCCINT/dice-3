@@ -1,0 +1,25 @@
+{
+  "short_name": "AI Logic Sorter",
+  "name": "Firebase AI Logic Photo Sorter",
+  "icons": [
+    {
+      "src": "firebase.png",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "firebase.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "firebase.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#a78bfa",
+  "background_color": "#121212"
+}
