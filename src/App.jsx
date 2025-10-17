@@ -15,7 +15,7 @@ function App() {
   useEffect(() => {
     const checkNanoAvailability = async () => {
       const languageModelProvider = await metadataModel.chromeAdapter.languageModelProvider;
-      if (!languageModelProvider || languageModelProvider.avalability()!= "available") {
+      if (!languageModelProvider || await languageModelProvider.availability()!= "available") {
         console.warn("Gemini Nano is not available. Falling back to cloud model.");
         setShowNanoAlert(true); 
       } else {
