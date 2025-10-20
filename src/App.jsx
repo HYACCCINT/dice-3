@@ -14,8 +14,8 @@ function App() {
 
   useEffect(() => {
     const checkNanoAvailability = async () => {
-      const languageModelProvider = await metadataModel.chromeAdapter.languageModelProvider;
-      if (!languageModelProvider || await languageModelProvider.availability()!= "available") {
+      const { languageModelProvider, onDeviceParams } = metadataModel.chromeAdapter;
+      if (await languageModelProvider?.availability(onDeviceParams.createOptions) !== "available") {
         console.warn("Gemini Nano is not available. Falling back to cloud model.");
         setShowNanoAlert(true); 
       } else {
@@ -55,15 +55,14 @@ function App() {
 
     for (const [index, data] of imageData.entries()) {
       try {
-        const [metadata] = await generateImageMetadata([data.file], userInput);
-
+        const metadata = await generateImageMetadata(data.file, userInput);
         setImageData(prev => prev.map((item, itemIndex) => 
           itemIndex === index 
-            ? { ...item, metadata: metadata, isLoading: false, error: !metadata } 
+            ? { ...item, metadata, isLoading: false }
             : item
         ));
       } catch (error) {
-        console.error(`Error processing image ${index}:`, error);
+        console.error(`Error generating image metadata ${index}:`, error);
         setImageData(prev => prev.map((item, itemIndex) => 
           itemIndex === index 
             ? { ...item, isLoading: false, error: true } 

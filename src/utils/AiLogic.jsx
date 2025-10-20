@@ -55,13 +55,13 @@ const sortingSchema = Schema.object({
 export const metadataModel = getGenerativeModel(ai, {
     mode: InferenceMode.PREFER_ON_DEVICE,
     inCloudParams: { model: "gemini-2.5-flash-lite", generationConfig: { responseMimeType: "application/json", responseSchema: metadataSchema }},
-    onDeviceParams: { promptOptions: { responseConstraint: metadataSchema }, createOptions: {expectedInputs: [{type: "image"}, {type: "text"}]}},
+    onDeviceParams: { promptOptions: { responseConstraint: metadataSchema }, createOptions: { expectedInputs: [{type: "image"}, {type: "text"}], expectedOutputs: [{type: 'text', languages: ['en']}] }},
 });
 
 const sortingModel = getGenerativeModel(ai, {
     mode: InferenceMode.PREFER_ON_DEVICE,
     inCloudParams: { model: "gemini-2.5-flash-lite", generationConfig: { responseMimeType: "application/json", responseSchema: sortingSchema }},
-    onDeviceParams: { promptOptions: { responseConstraint: sortingSchema }},
+    onDeviceParams: { promptOptions: { responseConstraint: sortingSchema }, createOptions: { expectedInputs: [{type: "text"}], expectedOutputs: [{type: 'text', languages: ['en']}] }},
 });
 
 const fileToGenerativePart = async (file) => {
@@ -75,22 +75,14 @@ const fileToGenerativePart = async (file) => {
   };
 }
 
-export const generateImageMetadata = async (images, userInput = '') => {
-  try {
-    const metadataPromises = images.map(async (imageFile) => {
-      const imagePart = await fileToGenerativePart(imageFile);
-      let prompt = `Analyze this image and generate the following metadata in JSON format: a concise 'description', an array of 4-7 'categories', and the top 3 'dominant_colors' as hex codes.`;
-      if (userInput) {
-        prompt += ` Focus the analysis on: "${userInput}".`;
-      }
-      const result = await metadataModel.generateContent([prompt, imagePart]);
-      return JSON.parse(result.response.text());
-    });
-    return await Promise.all(metadataPromises);
-  } catch (error) {
-    console.error("Error generating image metadata:", error);
-    return new Array(images.length).fill(null);
+export const generateImageMetadata = async (imageFile, userInput = '') => {
+  const imagePart = await fileToGenerativePart(imageFile);
+  let prompt = `Analyze this image and generate the following metadata in JSON format: a concise 'description', an array of 4-7 'categories', and the top 3 'dominant_colors' as hex codes.`;
+  if (userInput) {
+    prompt += ` Focus the analysis on: "${userInput}".`;
   }
+  const result = await metadataModel.generateContent([prompt, imagePart]);
+  return JSON.parse(result.response.text());
 }
 
 export const sortAndCategorizeImages = async (imageMetadataArray, sortBy) => {

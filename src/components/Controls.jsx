@@ -8,7 +8,7 @@ const Controls = ({ onFilesSelect, onAnalyze, onSort, onUserInputChange, userInp
           type="file"
           id="image-upload"
           multiple
-          accept="image/*"
+          accept="image/jpeg,image/png"
           hidden
           onChange={onFilesSelect}
           disabled={isAnalyzing}
